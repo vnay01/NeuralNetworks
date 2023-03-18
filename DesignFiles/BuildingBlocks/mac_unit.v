@@ -4,7 +4,7 @@
 // Engineer: Vinay Singh
 // 
 // Create Date: 02/05/2023 11:31:03 PM
-// Design Name: 
+// Design Name: Multiply and Accumulate without Scratchpad
 // Module Name: mac_unit
 // Project Name: 
 // Target Devices: 
