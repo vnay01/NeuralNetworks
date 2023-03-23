@@ -57,7 +57,7 @@
 
 //// Weight Stationary Structure
 /////// RESET  = ACTIVE LOW 
-module convolution_structure( clk, reset, enable, data_in, weight_in, data_out);
+module ProcessingEngine( clk, reset, enable, data_in, weight_in, data_out);
 
 /// Port Direction
     input clk;
@@ -178,10 +178,8 @@ module convolution_structure( clk, reset, enable, data_in, weight_in, data_out);
         end
  
  /////// Block to assign output
-   always@(posedge clk)
-        if(enable) begin
-        data_out <= add_out_3;
-        end
+   always@(*)
+        data_out = add_out_3;
          
     endmodule
     
