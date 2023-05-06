@@ -4,6 +4,8 @@
 `timescale 1ns/1ps
 `define low_val 1'b0
 `define count_depth 8
+`define mul_cycle 10
+`define add_cycle (`mul_cycle/2)
 `define data_width 32
 `define mem_depth 3
 `define select 3
@@ -17,8 +19,10 @@ module controller(
                     rom_address,
                     ram_address,
                     bank_select_line,
-                    select_line
-                    
+                    select_line,
+                    mul_enable,
+                    add_1_enable,
+                    add_2_enable                    
 );
 // port direction
     input clk;
@@ -30,6 +34,9 @@ module controller(
     output reg [`mem_depth-1:0] ram_address;
     output reg [`select:0] bank_select_line;
     output reg [`select-1:0] select_line;
+    output reg mul_enable;
+    output reg add_1_enable;
+    output reg add_2_enable; 
 
 //  internal signals
     reg read_en_next;
@@ -38,6 +45,8 @@ module controller(
     reg [`count_depth-1:0] count_next;
     reg [`select:0] bank_select_line_next;
     reg [`select-1:0] select_line_next;
+    reg [`mul_cycle : 0 ] mul_count, mul_count_next;
+   
     
 // state parameters
 localparam STATE_SIZE = 4;
@@ -45,10 +54,11 @@ localparam  START = 3'd0,
             READ = 3'd1,
             LOAD = 3'd2,
             MAC = 3'd3,
-            STORE = 3'd4,
-            DONE = 3'd5,
-            STATE_6_PLACEHOLDER = 3'd6,
+            ADD = 3'd4,
+            STORE = 3'd5,
+            DONE = 3'd6,
             STATE_7_PLACEHOLDER = 3'd7;
+            
             
 reg [STATE_SIZE-1:0]current_state, next_state;
 
@@ -69,6 +79,7 @@ begin
     read_en <= 1'b0;
     bank_select_line <= {`select{`low_val}};
     select_line <= {`select{`low_val}};
+    mul_count <= {`mul_cycle{`low_val}};
     end
     else if(enable) begin
     current_state <= next_state; 
@@ -78,6 +89,7 @@ begin
     read_en <= read_en_next;
     bank_select_line <= bank_select_line_next;
     select_line <= select_line_next;
+    mul_count <= mul_count_next;
     end
 
 end
@@ -126,11 +138,30 @@ always@(*)
                 next_state = MAC;
                 count_next = {`count_depth{`low_val}};
                 end
-        MAC : if(count==1)
+        
+        MAC :                               // Enable Multiply and ADD unit 
                 begin
-                next_state = LOAD;
-                count_next = {`count_depth{`low_val}};
+                        
+                        if (mul_count == `mul_cycle)begin
+                        mul_enable = 1'b0;
+                        next_state = ADD;  
+                        add_1_enable = 1'b1;                              
+                        end
+
                 end
+                    
+        ADD :                               // ADD from a FIFO
+                begin
+                       
+                        if (mul_count == `mul_cycle)begin
+                        mul_enable = 1'b0;
+                        next_state = STORE;     
+                        add_2_enable = 1'b1;                           
+                        end
+
+                end
+
+
         STORE : if(count==10)
                 begin
                 next_state = START;
@@ -140,14 +171,17 @@ always@(*)
                 next_state = START;
                 count_next = {`count_depth{`low_val}};
                 end  
+       /*
         STATE_6_PLACEHOLDER : begin 
                               next_state = START;
                               count_next = {`count_depth{`low_val}};
                               end
+                              */
         STATE_7_PLACEHOLDER :begin 
                              next_state = START;
                              count_next = {`count_depth{`low_val}};
-                             end                              
+                             end       
+                   
         //default : next_state = START;               
         endcase    
     end

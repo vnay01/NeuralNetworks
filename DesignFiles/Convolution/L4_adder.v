@@ -35,7 +35,7 @@ input reset;
 input enable;
 input [(data_width * array_size )-1:0] num_1;           
 input [(data_width * array_size )-1:0] num_2; 
-output reg [((data_width  * array_size ) + array_size - 1) :0] out_num;        // total output bit size : 136 bits
+output [((data_width  * array_size ) + array_size - 1) :0] out_num;        // total output bit size : 136 bits
 
 wire [data_width-1: 0] w_num_1 [array_size-1 : 0];
 wire [data_width-1: 0] w_num_2[array_size-1 : 0];
@@ -66,14 +66,17 @@ end
 endgenerate
 
 // Output sampling -- Reduce registers once design is functional
+assign out_num = {w_out_num[0]};
+/*
 always@(posedge clk)
     begin
         if (!reset) begin
             out_num <= {output_width{1'b0}};
             end
           else
-          out_num <= {w_out_num[1],w_out_num[0]};
+          out_num <= {w_out_num[0]};
            
     end
+    */
                      
 endmodule

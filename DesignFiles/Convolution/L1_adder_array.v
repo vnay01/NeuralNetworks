@@ -35,7 +35,7 @@ input reset;
 input enable;
 input [(data_width * array_size )-1:0] num_1;           
 input [(data_width * array_size )-1:0] num_2; 
-output reg [((data_width  * array_size ) + array_size - 1) :0] out_num;        // total output bit size : 136 bits
+output [((data_width  * array_size ) + array_size - 1) :0] out_num;        // total output bit size : 136 bits
 
 
 wire [data_width-1: 0]w_num_1[array_size-1 : 0];
@@ -67,7 +67,10 @@ end
 endgenerate
 
 /// Assignment to output port -- Looks like too many unnecesarry registers will be used.
- 
+assign  out_num = {w_out_num[7],w_out_num[6],w_out_num[5],w_out_num[4],
+                w_out_num[3],w_out_num[2],w_out_num[1],w_out_num[0]
+                };
+/*                 
 always@(posedge clk)
 begin
 if (!reset) begin
@@ -78,5 +81,5 @@ if (!reset) begin
                 w_out_num[3],w_out_num[2],w_out_num[1],w_out_num[0]
                 };
     end
-                         
+  */                       
 endmodule
