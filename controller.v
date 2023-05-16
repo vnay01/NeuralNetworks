@@ -101,7 +101,7 @@ always@(posedge clk)
 always@(*)
 begin
     // default values
-    next_state = current_state;     // preserve current state
+    next_state <= current_state;     // preserve current state
     
     count_next = count +1;          // increment counter by 1
     state_counter_next <= state_counter;    // For testing, I am updating this counter only when MEM_STORE state is reached. Will have to be reused 
@@ -115,7 +115,7 @@ begin
     case(current_state)
     
     INIT: if(START) begin
-            next_state = LOAD;
+            next_state <= LOAD;
             state_counter_next <= {counter_size{1'b0}}; 
             count_next <= {counter_size{1'b0}}; 
           end  
@@ -129,7 +129,7 @@ begin
             // count signal is used here to change states.
             
             if(count == 1) begin
-            next_state = MULT;                          // change state to MULT
+            next_state <= MULT;                          // change state to MULT
             count_next = {counter_size{1'b0}};          // reset counter to 0s
            end 
            end
@@ -140,27 +140,27 @@ begin
             // Since at this moment, I have not selected the architecutre
             // of multiplier to be used, I am using internal counter value for state transition logic
             if(count == 15) begin
-            next_state = L1_ADD;
+            next_state <= L1_ADD;
             count_next = {counter_size{1'b0}};
             end
 
     L1_ADD: if (count == 7)begin
-            next_state = L2_ADD;
+            next_state <= L2_ADD;
             count_next = {counter_size{1'b0}};
             end
             
     L2_ADD: if (count == 7)begin
-            next_state = L3_ADD;
+            next_state <= L3_ADD;
             count_next = {counter_size{1'b0}};
             end
 
     L3_ADD: if (count == 7)begin
-            next_state = L4_ADD;
+            next_state <= L4_ADD;
             count_next = {counter_size{1'b0}};
             end
     
     L4_ADD: if (count == 7)begin
-            next_state = MEM_STORE;
+            next_state <= MEM_STORE;
             count_next = {counter_size{1'b0}};
             end
 
@@ -170,7 +170,7 @@ begin
                 // size of the convoluted matrix.
                 // Keeping it a fixed number of 256 for the sake of testing 
             if (state_counter == 256) begin
-                next_state = INIT;
+                next_state <= INIT;
                 DONE = 1'b1;
                 
                 end
@@ -178,7 +178,7 @@ begin
                     begin
                         
                         if (count == 10)begin           // this is not required later on
-                        next_state = LOAD;
+                        next_state <= LOAD;
                         state_counter_next <= state_counter + 1; 
                         count_next = {counter_size{1'b0}};
                         end
