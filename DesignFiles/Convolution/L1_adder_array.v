@@ -36,13 +36,16 @@ input enable;
 input [(data_width * array_size )-1:0] num_1;           
 input [(data_width * array_size )-1:0] num_2; 
 output [((data_width  * array_size ) + array_size - 1) :0] out_num;        // total output bit size : 136 bits
+//output [((data_width  * array_size ) + array_size - 1) :0] data_out;        // total output bit size : 136 bits
+
+
 
 
 wire [data_width-1: 0]w_num_1[array_size-1 : 0];
 wire [data_width-1: 0]w_num_2[array_size-1 : 0];
 wire [data_width : 0] w_out_num [array_size -1 : 0];
 
-parameter output_width = (data_width  * array_size ) + array_size ;
+parameter output_width = (data_width  * array_size ) + array_size ;     // (16 x 8) + 8 = 136 bits
 
 genvar i;
 
@@ -66,20 +69,11 @@ for(i = 0; i < array_size; i = i + 1) begin
 end
 endgenerate
 
-/// Assignment to output port -- Looks like too many unnecesarry registers will be used.
-assign  out_num = {w_out_num[7],w_out_num[6],w_out_num[5],w_out_num[4],
-                w_out_num[3],w_out_num[2],w_out_num[1],w_out_num[0]
-                };
-/*                 
-always@(posedge clk)
-begin
-if (!reset) begin
-    out_num <= {output_width{1'b0}};
-    end
-    else
-    out_num <= {w_out_num[7],w_out_num[6],w_out_num[5],w_out_num[4],
-                w_out_num[3],w_out_num[2],w_out_num[1],w_out_num[0]
-                };
-    end
-  */                       
+
+/// Assignment to output port
+
+for (i = 0 ; i < array_size; i = i + 1) begin
+assign out_num[((i+1)*output_width/array_size)-1 : ((i)*output_width/array_size)] = w_out_num[i];
+end
+                      
 endmodule

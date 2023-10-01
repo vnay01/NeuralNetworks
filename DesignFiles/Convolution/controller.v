@@ -18,7 +18,8 @@ Signal brief:
 module controller(  
                     clk,
                     reset,  // ACTIVE LOW reset
-                    START,         
+                    START,
+                    MEM_READ,         
                     BUSY,
                     DONE,
                     input_matrix_ram_en,
@@ -27,14 +28,16 @@ module controller(
                     filter_matrix_rom_en,
                     filter_matrix_rom_read_en,
                     filter_matrix_rom_address,
-                    data_path_signal                             
+                    data_path_signal,
+                    fifo_command                             
     );
     
 /// Port directions
 
 input clk;
 input reset;
-input START;         
+input START;      
+input MEM_READ;   
 output reg BUSY;
 output reg DONE;
 output reg input_matrix_ram_en;
@@ -44,6 +47,7 @@ output reg filter_matrix_rom_en;
 output reg filter_matrix_rom_read_en;
 output reg filter_matrix_rom_address;
 output reg [4:0] data_path_signal;          // concatnation of signals which control different sections of datapath
+output reg [1:0] fifo_command;
 
 // Internal counters
 parameter counter_size = 10;
@@ -52,6 +56,7 @@ reg [counter_size-1:0] count, count_next;
 reg [counter_size-1:0] state_counter, state_counter_next; 
 reg [9:0] w_input_matrix_ram_address, w_input_matrix_ram_address_next; 
 reg w_filter_matrix_rom_address, w_filter_matrix_rom_address_next;
+reg [1:0] w_fifo_command, w_fifo_command_next;
     
 // State variables
    parameter STATE_SIZE = 8;
@@ -81,6 +86,8 @@ always@(posedge clk)
         
         input_matrix_ram_address <= {10{1'b0}};
         filter_matrix_rom_address <= 1'b0; 
+        
+        w_fifo_command <= {2{1'b0}}; 
         end
         else
         begin
@@ -93,6 +100,7 @@ always@(posedge clk)
         
         input_matrix_ram_address <= w_input_matrix_ram_address;
         filter_matrix_rom_address <= w_filter_matrix_rom_address;
+        w_fifo_command <= w_fifo_command_next;
         end  
         end           
     
@@ -101,13 +109,14 @@ always@(posedge clk)
 always@(*)
 begin
     // default values
-    next_state = current_state;     // preserve current state
+    next_state = current_state;      // preserve current state
     
-    count_next = count +1;          // increment counter by 1
+    count_next = count + 1;          // increment counter by 1
     state_counter_next = state_counter;    // For testing, I am updating this counter only when MEM_STORE state is reached. Will have to be reused 
    
     w_input_matrix_ram_address_next = w_input_matrix_ram_address;  // 
     w_filter_matrix_rom_address_next = w_filter_matrix_rom_address;    
+    w_fifo_command_next <= w_fifo_command;
     
     
     DONE = 1'b0;
@@ -124,6 +133,7 @@ begin
     LOAD: begin
             w_filter_matrix_rom_address_next = w_filter_matrix_rom_address + 1 ; 
             w_input_matrix_ram_address_next = w_input_matrix_ram_address + 1;
+            w_fifo_command_next <= {2{1'b0}};
             
             // Optimization candidate
             // count signal is used here to change states.
@@ -166,13 +176,14 @@ begin
             end
 
 
-   MEM_STORE: // Optimization candidate
+   MEM_STORE: // Optimization candidate -- Can be eliminated entirely
                 // Total number of mem_store operations is decided by the 
                 // size of the convoluted matrix.
                 // Keeping it a fixed number of 256 for the sake of testing 
             if (state_counter == 256) begin
                 next_state = INIT;
                 DONE = 1'b1;
+                w_fifo_command_next <= 2'b01;       // enable READ operation
                 
                 end
                 else
@@ -182,6 +193,7 @@ begin
                         next_state = LOAD;
                         state_counter_next = state_counter + 1; 
                         count_next = {counter_size{1'b0}};
+                        w_fifo_command_next <= 2'b10;       // enable WRITE
                         end
                         end
                     
@@ -209,7 +221,10 @@ begin
     filter_matrix_rom_read_en = 1'b0;  // Not used in this ROM from Xilinx
     
     // data_path control signals
-    data_path_signal = 5'b00000;    
+    data_path_signal = 5'b00000;   
+    
+    // FIFO commands
+    fifo_command = w_fifo_command; 
     
     // Value assignment logic
     case(current_state)
@@ -249,6 +264,7 @@ begin
     MEM_STORE:
            begin
            data_path_signal = 5'b00000;
+           //// fifo_command will need to be made such that MEM_STORE can be eliminated 
            end              
     default : 
            begin

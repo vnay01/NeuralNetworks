@@ -15,9 +15,12 @@
 
 
 // Module file inclusion
+
 `ifndef mul
-  `include "/media/vnay01/B8BA7DCEBA7D89A0/Users/vnay0/Documents/GitHub/NeuralNetworks/DesignFiles/BuildingBlocks/multiply.v"
+//  `include "/media/vnay01/B8BA7DCEBA7D89A0/Users/vnay0/Documents/GitHub/NeuralNetworks/DesignFiles/BuildingBlocks/multiply.v"
+  `include "multiply.v"
   `endif
+  
     
     
 /*This module is an array of 4 multiplier units*/
