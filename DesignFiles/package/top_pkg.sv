@@ -2,10 +2,20 @@
 
 package top_pkg;
 
-//
+// global parameters
 localparam RST_INITIAL_DELAY = 50;
 localparam RST_HOLD_DELAY = 100;
 localparam CLOCK_PERIOD = 10;
+
+// AXI4 interface parameters
+// AXI4 full
+localparam ID_WIDTH = 2;
+localparam AXI4_ADDR_WIDTH = 32;
+localparam AXI4_DATA_WIDTH = 32;
+
+// AXI4 Lite
+localparam AXI4LITE_ADDR_WIDTH = 32;
+localparam AXI4LITE_DATA_WIDTH = 32;
 
 
 // parameter for mac_unit
