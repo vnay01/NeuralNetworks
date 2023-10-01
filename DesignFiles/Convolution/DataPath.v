@@ -6,26 +6,29 @@
 // Design Name: 
 // Module Name: DataPath
 //////////////////////////////////////////////////////////////////////////////////
+
 `ifndef multiplier_array
-`include "/media/vnay01/New Volume1/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/multiplier_array.v"
+`include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/multiplier_array.v"
 `endif
 
+
 `ifndef L1_adder_array
-`include "/media/vnay01/New Volume1/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L1_adder_array.v"
+`include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L1_adder_array.v"
 `endif
 
 `ifndef L2_adder_array
-`include "/media/vnay01/New Volume1/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L2_adder_array.v"
+`include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L2_adder_array.v"
 `endif
 
 `ifndef L3_adder_array
-`include "/media/vnay01/New Volume1/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L3_adder_array.v"
+`include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L3_adder_array.v"
 `endif
 
 `ifndef L4_adder_array
-`include "/media/vnay01/New Volume1/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L4_adder.v"
+`include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/L4_adder.v"
 `endif
 
+// `include "/home/vnay01/Desktop/ConvNeuralNet/ConvNeuralNet.srcs/sources_1/new/inlcude_files.v"
 
 module DataPath #(parameter mul_out_width = 256, 
                   parameter l1_adder_out_width = 136,
@@ -54,7 +57,7 @@ input l3_add_enable;
 input l4_add_enable;
 input [127:0]input_matrix_reg;     // size : 16 x 8 bits
 input [127:0] filter_matrix_reg;   // size : 16 x 8 bits
-output reg [l4_adder_out_width:0] conv_out;
+output reg [l4_adder_out_width -1 :0] conv_out;
 
 //// Internal Wirings
 wire [mul_out_width -1 : 0] multiplier_out;

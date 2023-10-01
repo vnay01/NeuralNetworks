@@ -30,7 +30,7 @@
 `ifndef low_val    
     `define low_val 1'b0
     `endif 
-  
+ 
   `ifndef mul
     `include "multiply.v"
     `endif
@@ -38,6 +38,7 @@
   `ifndef adder
     `include "adder.v"
     `endif 
+
 
 module mac_unit ( input clk, reset, enable,
                   input [`num_width-1 :0] num_1, num_2,

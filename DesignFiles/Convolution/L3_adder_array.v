@@ -68,17 +68,8 @@ end
 endgenerate
 
 // Output sampling -- Reduce registers once design is functional
-assign out_num = {w_out_num[1],w_out_num[0]};
-/*
-always@(posedge clk)
-    begin
-        if (!reset) begin
-            out_num <= {output_width{1'b0}};
-            end
-          else
-          out_num <= {w_out_num[1],w_out_num[0]};
-           
+    for (i = 0 ; i < array_size; i = i + 1) begin
+    assign out_num[((i+1)*output_width/array_size)-1 : ((i)*output_width/array_size)] = w_out_num[i];
     end
-               
-*/                     
+                  
 endmodule
