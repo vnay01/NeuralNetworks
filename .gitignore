@@ -2,5 +2,14 @@
 *.str
 *.jou
 *.log
-/MatrixMultiplier
-rm
+*.bin
+
+MatrixMultiplier/
+
+DesignFile/.vscode/
+DesignFile/build/
+
+
+
+# Vivado Files
+vivado_project/ 
